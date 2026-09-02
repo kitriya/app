@@ -85,8 +85,8 @@ class User(Base):
     messages_received = relationship("Message", back_populates="recipient", foreign_keys="Message.recipient_id", cascade="all, delete-orphan")
     notifications = relationship("Notification", back_populates="user", foreign_keys="Notification.user_id", cascade="all, delete-orphan")
 
-    following = relationship("User", secondary=follows, primaryjoin=id == follows.c.follower_id, secondaryjoin=id == follows.c.following_id)
-    followers = relationship("User", secondary=follows, primaryjoin=id == follows.c.following_id, secondaryjoin=id == follows.c.follower_id)
+    following = relationship("User", secondary=follows, primaryjoin=id == follows.c.follower_id, secondaryjoin=id == follows.c.following_id, overlaps="followers")
+    followers = relationship("User", secondary=follows, primaryjoin=id == follows.c.following_id, secondaryjoin=id == follows.c.follower_id, overlaps="following")
     blocked_users = relationship("User", secondary=blocks, primaryjoin=id == blocks.c.blocker_id, secondaryjoin=id == blocks.c.blocked_id)
     muted_users = relationship("User", secondary=mutes, primaryjoin=id == mutes.c.muter_id, secondaryjoin=id == mutes.c.muted_id)
     close_friends = relationship("User", secondary=close_friends, primaryjoin=id == close_friends.c.user_id, secondaryjoin=id == close_friends.c.friend_id)
