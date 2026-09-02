@@ -69,8 +69,7 @@ def get_current_user(request: Request, db: Session) -> Optional[User]:
 
 def render(request, name, db, active_tab=None, **kwargs):
     current_user = get_current_user(request, db)
-    return templates.TemplateResponse(name, {
-        "request": request,
+    return templates.TemplateResponse(request, name, {
         "current_user": current_user,
         "active_tab": active_tab,
         **kwargs,
