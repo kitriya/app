@@ -65,6 +65,28 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+// ---- Reels: tap video to toggle sound (matches the muted-icon overlay) ----
+function lufricaToggleMute(video, event) {
+  event.preventDefault();
+  video.muted = !video.muted;
+
+  const container = video.parentElement;
+  const icon = container.querySelector('.mute-icon');
+  if (!icon) return;
+
+  if (video.muted) {
+    icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+  } else {
+    icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/>';
+    // Only one reel should play with sound at a time — mute any others.
+    document.querySelectorAll('video').forEach(function (v) {
+      if (v !== video) v.muted = true;
+    });
+    document.querySelectorAll('.mute-icon').forEach(function (i) {
+      if (i !== icon) i.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+    });
+  }
+}
 // ---- Create page: media type toggle (accept + multiple) ----
 function lufricaSetAccept(radio) {
   const input = document.getElementById('media-input');
