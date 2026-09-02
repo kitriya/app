@@ -19,8 +19,9 @@
   {% endfor %}
 </div>
 
-<form method="post" action="/send-message/{{ other_user.id }}" style="position:fixed; bottom:0; width:100%; max-width:480px; display:flex; gap:8px; padding:12px 16px; background:#100E13; border-top:1px solid #2C2830;">
+<form method="post" action="/send-message/{{ other_user.id }}" style="position:fixed; bottom:64px; width:100%; max-width:480px; display:flex; gap:8px; padding:12px 16px; background:#100E13; border-top:1px solid #2C2830; z-index:4;">
   <input type="text" name="body" placeholder="Message..." required style="flex:1; background:#1B181F; border:1px solid #2C2830; border-radius:20px; padding:10px 16px; color:#F4EFE6; font-size:14px;">
   <button type="submit" style="background:#D4A017; color:#100E13; border:none; border-radius:20px; padding:0 18px; font-weight:700; font-size:14px;">Send</button>
 </form>
+<div style="height: 60px;"></div>
 {% endblock %}
