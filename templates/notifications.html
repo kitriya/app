@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding: 16px 0;">
+  <h2 style="font-family:'Fraunces',serif; color:#F4EFE6; font-size:19px; margin:0 0 12px; padding:0 18px;">Notifications</h2>
+
+  {% if notifications %}
+  {% for n in notifications %}
+  <div style="display:flex; align-items:center; gap:12px; padding:12px 18px; border-bottom:1px solid #2C2830; {{ '' if n.is_read else 'background:rgba(212,160,23,0.06);' }}">
+    {% if n.actor %}
+      {% if n.actor.profile_pic %}
+      <img src="{{ n.actor.profile_pic }}" style="width:38px; height:38px; border-radius:50%; object-fit:cover;">
+      {% else %}
+      <div style="width:38px; height:38px; border-radius:50%; background:{{ n.actor.theme_color }}; display:flex; align-items:center; justify-content:center; color:#100E13; font-weight:700; font-size:13px;">{{ n.actor.username[:2]|upper }}</div>
+      {% endif %}
+    {% endif %}
+    <div style="flex:1;">
+      <p style="color:#F4EFE6; font-size:13.5px; margin:0;">{{ n.body }}</p>
+      <p style="color:#9A94A0; font-size:11.5px; margin:2px 0 0;">{{ n.created_at.strftime('%b %d, %H:%M') }}</p>
+    </div>
+    {% if n.notification_type == 'follow' and n.actor %}
+    <form method="post" action="/follow/{{ n.actor.id }}">
+      <input type="hidden" name="next" value="/notifications">
+      <button type="submit" style="background:#1B181F; color:#F4EFE6; border:1px solid #2C2830; border-radius:8px; padding:6px 12px; font-size:12px;">Follow back</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+  <p style="color:#9A94A0; text-align:center; padding:32px 18px;">Nothing yet — likes, comments, and follows will show up here.</p>
+  {% endif %}
+</div>
+{% endblock %}

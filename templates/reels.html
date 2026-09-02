@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="height: calc(100vh - 130px); overflow-y: auto; scroll-snap-type: y mandatory;">
+  {% for post in posts %}
+  <div style="position:relative; height:calc(100vh - 130px); background:#000; scroll-snap-align:start; border-bottom:1px solid #2C2830;">
+    {% if post.media_paths %}
+    <video src="{{ post.media_paths[0] }}" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+    {% endif %}
+
+    <div style="position:absolute; right:12px; bottom:90px; display:flex; flex-direction:column; align-items:center; gap:20px;">
+      <form method="post" action="/like/{{ post.id }}" class="like-form">
+        <input type="hidden" name="next" value="/reels">
+        <button type="submit" data-liked="{{ 'true' if post.id in liked_ids else 'false' }}" style="background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:3px;">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="{{ '#C4536B' if post.id in liked_ids else 'none' }}" stroke="{{ '#C4536B' if post.id in liked_ids else '#F4EFE6' }}" stroke-width="1.6"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 5.5 4 2-2.5 3.5-4 5.5-4C21 5 23.5 8.5 21.5 12.5 19 16.65 12 21 12 21z"/></svg>
+          <span class="like-count" data-count="{{ post.likes_count }}" style="color:#F4EFE6; font-size:11px;">{{ post.likes_count }}</span>
+        </button>
+      </form>
+      <a href="/post/{{ post.id }}" style="color:#F4EFE6; font-size:11px; display:flex; flex-direction:column; align-items:center; gap:3px; text-decoration:none;">
+        <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="#F4EFE6" stroke-width="1.6"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        {{ post.comments_count }}
+      </a>
+    </div>
+
+    <div style="position:absolute; left:14px; bottom:20px; right:70px;">
+      <a href="/profile/{{ post.author.username }}" style="display:flex; align-items:center; gap:8px; margin-bottom:6px; text-decoration:none;">
+        {% if post.author.profile_pic %}
+        <img src="{{ post.author.profile_pic }}" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+        {% else %}
+        <div style="width:28px; height:28px; border-radius:50%; background:{{ ['#D4A017','#3E8E8A','#C4536B','#7C6FA3','#4C7EA8'][post.user_id % 5] }}; display:flex; align-items:center; justify-content:center; color:#100E13; font-size:11px; font-weight:700;">{{ post.author.username[:2]|upper }}</div>
+        {% endif %}
+        <span style="color:#F4EFE6; font-size:13.5px; font-weight:700;">{{ post.author.username }}</span>
+      </a>
+      <p style="color:#F4EFE6; font-size:13px; line-height:1.35; margin:0;">{{ post.caption|linkify }}</p>
+    </div>
+  </div>
+  {% else %}
+  <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#9A94A0; text-align:center; padding:0 32px;">
+    No reels yet — upload one from the create tab.
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

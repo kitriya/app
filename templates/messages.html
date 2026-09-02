@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding: 16px 0;">
+  <div style="padding: 0 18px 12px; display:flex; align-items:center; justify-content:space-between;">
+    <h2 style="font-family:'Fraunces',serif; color:#F4EFE6; font-size:19px; margin:0;">Messages</h2>
+    {% if unread_count %}<span style="background:#C4536B; color:#F4EFE6; font-size:11px; padding:2px 8px; border-radius:10px;">{{ unread_count }} new</span>{% endif %}
+  </div>
+
+  {% if conversations %}
+  {% for u in conversations %}
+  <a href="/dm/{{ u.username }}" style="display:flex; align-items:center; gap:12px; padding:12px 18px; border-bottom:1px solid #2C2830;">
+    {% if u.profile_pic %}
+    <img src="{{ u.profile_pic }}" style="width:44px; height:44px; border-radius:50%; object-fit:cover;">
+    {% else %}
+    <div style="width:44px; height:44px; border-radius:50%; background:{{ u.theme_color }}; display:flex; align-items:center; justify-content:center; color:#100E13; font-weight:700;">{{ u.username[:2]|upper }}</div>
+    {% endif %}
+    <span style="color:#F4EFE6; font-size:14.5px; font-weight:600;">{{ u.username }}</span>
+  </a>
+  {% endfor %}
+  {% else %}
+  <p style="color:#9A94A0; text-align:center; padding:32px 18px;">No conversations yet. Message someone from their profile.</p>
+  {% endif %}
+</div>
+{% endblock %}

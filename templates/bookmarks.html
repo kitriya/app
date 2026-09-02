@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding: 16px 0;">
+  <h2 style="font-family:'Fraunces',serif; color:#F4EFE6; font-size:19px; margin:0 0 12px; padding:0 18px;">Saved</h2>
+
+  {% if posts %}
+  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px;">
+    {% for post in posts %}
+    <div style="aspect-ratio:1/1; position:relative; background:#1B181F;">
+      {% if post.media_paths %}
+        {% if post.media_type == 'reel' %}
+        <video src="{{ post.media_paths[0] }}" muted style="width:100%; height:100%; object-fit:cover;"></video>
+        {% else %}
+        <img src="{{ post.media_paths[0] }}" style="width:100%; height:100%; object-fit:cover;">
+        {% endif %}
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="color:#9A94A0; text-align:center; padding:32px 18px;">Nothing saved yet. Tap the bookmark icon on any post.</p>
+  {% endif %}
+</div>
+{% endblock %}

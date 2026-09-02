@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding: 20px 18px;">
+  <h2 style="font-family:'Fraunces',serif; color:#F4EFE6; font-size:19px; margin:0 0 16px;">New post</h2>
+
+  {% if error %}<p style="color:#C4536B; font-size:13px; margin:0 0 14px;">{{ error }}</p>{% endif %}
+
+  <form method="post" action="/create" enctype="multipart/form-data">
+    <div style="display:flex; gap:16px; margin-bottom:16px; font-size:14px; color:#F4EFE6;">
+      <label><input type="radio" name="media_type" value="photo" checked onchange="lufricaSetAccept(this)"> Photo</label>
+      <label><input type="radio" name="media_type" value="reel" onchange="lufricaSetAccept(this)"> Reel</label>
+      <label><input type="radio" name="media_type" value="carousel" onchange="lufricaSetAccept(this)"> Carousel</label>
+    </div>
+
+    <label style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; border:1.5px dashed #2C2830; border-radius:12px; background:#1B181F; aspect-ratio:4/5; cursor:pointer; text-align:center; padding:20px; color:#9A94A0; font-size:13.5px;">
+      <input type="file" name="media" id="media-input" accept="image/*" multiple required onchange="lufricaPreview(event)" style="display:none;">
+      <span id="dropzone-label">Tap to choose a photo from your device</span>
+      <div id="preview"></div>
+    </label>
+
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <select name="filter_name" id="filter-select" onchange="lufricaApplyFilter(this.value)" style="flex:1; padding:10px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:13px;">
+        <option value="none">No filter</option>
+        <option value="noir">Noir</option>
+        <option value="warm">Warm</option>
+        <option value="fade">Fade</option>
+        <option value="vivid">Vivid</option>
+      </select>
+      <select name="visibility" style="flex:1; padding:10px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:13px;">
+        <option value="public">Public</option>
+        <option value="followers">Followers only</option>
+        <option value="close_friends">Close friends</option>
+      </select>
+    </div>
+
+    <input type="text" name="location" placeholder="Add location (optional)" style="width:100%; margin-top:10px; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:14px;">
+
+    <input type="text" name="alt_text" placeholder="Alt text for accessibility (optional)" style="width:100%; margin-top:10px; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:14px;">
+
+    <textarea name="caption" placeholder="Write a caption — use #tags and @mentions" rows="3" style="width:100%; margin-top:10px; padding:12px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:14px; resize:none;"></textarea>
+
+    <button type="submit" style="width:100%; padding:12px 14px; border-radius:10px; border:none; background:#D4A017; color:#100E13; font-size:15px; font-weight:700; margin-top:16px;">Share</button>
+  </form>
+
+  {% if drafts %}
+  <div style="margin-top: 28px;">
+    <p style="color:#9A94A0; font-size:12px; text-transform:uppercase; margin-bottom:10px;">Saved drafts</p>
+    {% for d in drafts %}
+    <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #2C2830;">
+      {% if d.media_paths %}<img src="{{ d.media_paths[0] }}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">{% endif %}
+      <span style="color:#F4EFE6; font-size:13px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ d.caption or "No caption" }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

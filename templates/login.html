@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; padding: 48px 28px; text-align: center;">
+  <div style="margin-bottom: 32px;">
+    <span style="font-family:'Alex Brush', cursive; font-size:52px; color:#D4A017; line-height:1;">Lufrica</span>
+  </div>
+
+  <h1 style="font-family:'Fraunces',serif; font-weight:500; font-size:22px; color:#F4EFE6; margin:0 0 4px;">Welcome back</h1>
+  <p style="color:#9A94A0; font-size:14px; margin:0 0 28px;">Log in to see what people are sharing.</p>
+
+  <form method="post" action="/login" style="width:100%; max-width:300px; text-align:left;">
+    <label style="display:block; margin-bottom:16px;">
+      <span style="display:block; font-size:13px; color:#9A94A0; margin-bottom:6px;">Email</span>
+      <input type="email" name="email" placeholder="you@example.com" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:15px; font-family:inherit;">
+    </label>
+    <label style="display:block; margin-bottom:16px;">
+      <span style="display:block; font-size:13px; color:#9A94A0; margin-bottom:6px;">Password</span>
+      <input type="password" name="password" placeholder="••••••••" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:15px; font-family:inherit;">
+    </label>
+    {% if error %}<p style="color:#C4536B; font-size:13px; margin:-8px 0 14px;">{{ error }}</p>{% endif %}
+    <button type="submit" style="width:100%; padding:12px 14px; border-radius:10px; border:none; background:#D4A017; color:#100E13; font-size:15px; font-weight:700; cursor:pointer;">Log in</button>
+  </form>
+
+  <a href="/register" style="display:block; margin-top:20px; color:#3E8E8A; font-size:14px; font-weight:600; text-decoration:none;">Don't have an account? Sign up</a>
+</div>
+{% endblock %}

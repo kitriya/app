@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding: 20px 18px;">
+  <h2 style="font-family:'Fraunces',serif; color:#F4EFE6; font-size:19px; margin:0 0 20px;">Edit profile</h2>
+
+  <form method="post" action="/edit-profile" enctype="multipart/form-data">
+    <label style="display:block; margin-bottom:18px;">
+      <span style="display:block; font-size:13px; color:#9A94A0; margin-bottom:6px;">Profile photo</span>
+      <input type="file" name="profile_pic" accept="image/*" style="color:#9A94A0; font-size:13px;">
+    </label>
+
+    <label style="display:block; margin-bottom:18px;">
+      <span style="display:block; font-size:13px; color:#9A94A0; margin-bottom:6px;">Banner image</span>
+      <input type="file" name="banner" accept="image/*" style="color:#9A94A0; font-size:13px;">
+    </label>
+
+    <label style="display:block; margin-bottom:18px;">
+      <span style="display:block; font-size:13px; color:#9A94A0; margin-bottom:6px;">Bio</span>
+      <textarea name="bio" rows="3" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:14px; resize:none;">{{ current_user.bio }}</textarea>
+    </label>
+
+    <label style="display:block; margin-bottom:18px;">
+      <span style="display:block; font-size:13px; color:#9A94A0; margin-bottom:6px;">Website</span>
+      <input type="text" name="website" value="{{ current_user.website }}" placeholder="https://" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:14px;">
+    </label>
+
+    <label style="display:block; margin-bottom:18px;">
+      <span style="display:block; font-size:13px; color:#9A94A0; margin-bottom:6px;">Accent color</span>
+      <input type="color" name="theme_color" value="{{ current_user.theme_color }}" style="width:60px; height:36px; border-radius:8px; border:1px solid #2C2830; background:none;">
+    </label>
+
+    <label style="display:flex; align-items:center; gap:8px; margin-bottom:24px; color:#F4EFE6; font-size:14px;">
+      <input type="checkbox" name="is_private" value="true" {{ 'checked' if current_user.is_private }}>
+      Private account
+    </label>
+
+    <button type="submit" style="width:100%; padding:12px 14px; border-radius:10px; border:none; background:#D4A017; color:#100E13; font-size:15px; font-weight:700;">Save changes</button>
+  </form>
+</div>
+{% endblock %}

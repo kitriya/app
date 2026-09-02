@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if profile_user.banner %}
+<div style="width:100%; height:120px; background:url({{ profile_user.banner }}) center/cover;"></div>
+{% else %}
+<div class="lf-live" style="width:100%; height:120px; background:linear-gradient(120deg, {{ profile_user.theme_color }}, #1B181F, {{ profile_user.theme_color }}); background-size:200% 200%;"></div>
+{% endif %}
+
+<div style="padding: 0 18px 18px;">
+  <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-top:-36px; margin-bottom:12px;">
+    <div style="border-radius:50%; box-shadow:0 0 0 3px #100E13, 0 0 18px {{ profile_user.theme_color }}88;">
+      {% if profile_user.profile_pic %}
+      <img src="{{ profile_user.profile_pic }}" style="width:76px; height:76px; border-radius:50%; object-fit:cover; display:block;">
+      {% else %}
+      <div style="width:76px; height:76px; border-radius:50%; background:{{ profile_user.theme_color }}; display:flex; align-items:center; justify-content:center; color:#100E13; font-size:26px; font-weight:700;">{{ profile_user.username[:2]|upper }}</div>
+      {% endif %}
+    </div>
+
+    {% if is_owner %}
+    <div style="display:flex; gap:8px;">
+      <a href="/settings" style="padding:8px 12px; border-radius:8px; border:1px solid #2C2830; color:#F4EFE6; font-size:13px;">⚙️</a>
+      <a href="/edit-profile" style="padding:8px 16px; border-radius:8px; border:1px solid #2C2830; color:#F4EFE6; font-size:13px; font-weight:600;">Edit profile</a>
+    </div>
+    {% else %}
+    <div style="display:flex; gap:8px;">
+      <form method="post" action="/follow/{{ profile_user.id }}">
+        <input type="hidden" name="next" value="/profile/{{ profile_user.username }}">
+        <button type="submit" style="padding:8px 18px; border-radius:8px; border:none; background:{{ '#1B181F' if is_following else '#D4A017' }}; color:{{ '#F4EFE6' if is_following else '#100E13' }}; font-size:13px; font-weight:700;">{{ 'Following' if is_following else 'Follow' }}</button>
+      </form>
+      <a href="/dm/{{ profile_user.username }}" style="padding:8px 16px; border-radius:8px; border:1px solid #2C2830; color:#F4EFE6; font-size:13px; font-weight:600;">Message</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <p style="color:#F4EFE6; font-size:16px; font-weight:700; margin:0; display:flex; align-items:center; gap:6px;">
+    {{ profile_user.username }}
+    {% if profile_user.verified %}<span style="color:#3E8E8A;">✓</span>{% endif %}
+    {% if profile_user.is_private %}<span style="color:#9A94A0; font-size:12px;">🔒 Private</span>{% endif %}
+  </p>
+  {% if profile_user.bio %}<p style="color:#F4EFE6; font-size:13.5px; margin:6px 0 0;">{{ profile_user.bio|linkify }}</p>{% endif %}
+  {% if profile_user.website %}<a href="{{ profile_user.website }}" style="color:#3E8E8A; font-size:13px;">{{ profile_user.website }}</a>{% endif %}
+
+  <div style="display:flex; gap:20px; margin:14px 0;">
+    <span style="color:#F4EFE6; font-size:13.5px;"><strong>{{ posts|length }}</strong> posts</span>
+    <a href="/profile/{{ profile_user.username }}/followers" style="color:#F4EFE6; font-size:13.5px; text-decoration:none;"><strong data-countup="{{ followers_count }}">0</strong> followers</a>
+    <a href="/profile/{{ profile_user.username }}/following" style="color:#F4EFE6; font-size:13.5px; text-decoration:none;"><strong data-countup="{{ following_count }}">0</strong> following</a>
+  </div>
+
+  {% if not is_owner %}
+  <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:4px;">
+    <form method="post" action="/mute/{{ profile_user.id }}"><input type="hidden" name="next" value="/profile/{{ profile_user.username }}"><button type="submit" style="background:none; border:none; color:#9A94A0; font-size:12px;">{{ 'Unmute' if is_muted else 'Mute' }}</button></form>
+    <form method="post" action="/close-friend/{{ profile_user.id }}"><input type="hidden" name="next" value="/profile/{{ profile_user.username }}"><button type="submit" style="background:none; border:none; color:{{ '#3E8E8A' if is_close_friend else '#9A94A0' }}; font-size:12px;">{{ 'Remove close friend' if is_close_friend else 'Add close friend' }}</button></form>
+    <form method="post" action="/block/{{ profile_user.id }}"><input type="hidden" name="next" value="/profile/{{ profile_user.username }}"><button type="submit" style="background:none; border:none; color:#C4536B; font-size:12px;">Block</button></form>
+    <button onclick="lufricaReportUser({{ profile_user.id }}, '{{ profile_user.username }}')" style="background:none; border:none; color:#C4536B; font-size:12px;">Report</button>
+  </div>
+  {% endif %}
+</div>
+
+{% if posts %}
+<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px;">
+  {% for p in posts %}
+  <a href="/post/{{ p.id }}" style="aspect-ratio:1/1; position:relative; background:#1B181F; display:block;">
+    {% if p.media_paths %}
+      {% if p.media_type == 'reel' %}
+      <video src="{{ p.media_paths[0] }}" muted style="width:100%; height:100%; object-fit:cover;"></video>
+      {% else %}
+      <img src="{{ p.media_paths[0] }}" class="lf-filter-{{ p.filter_name }}" style="width:100%; height:100%; object-fit:cover;">
+      {% endif %}
+    {% endif %}
+    {% if p.pinned %}<span style="position:absolute; top:6px; left:6px;">📌</span>{% endif %}
+    {% if p.media_type == 'carousel' %}<span style="position:absolute; top:6px; right:6px; color:#F4EFE6; font-size:11px;">▤</span>{% endif %}
+    {% if p.media_type == 'reel' %}<span style="position:absolute; top:6px; right:6px; color:#F4EFE6;">▶</span>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p style="color:#9A94A0; text-align:center; padding:24px;">{{ 'Nothing posted yet.' if is_owner else 'This account is private or has no posts.' }}</p>
+{% endif %}
+
+{% if is_owner %}
+<div style="padding: 18px;">
+  <a href="/bookmarks" style="display:block; text-align:center; padding:10px 0; color:#3E8E8A; font-size:13.5px; font-weight:600; margin-bottom:8px;">Saved posts</a>
+  <a href="/logout" style="display:flex; align-items:center; justify-content:center; width:100%; padding:11px 0; border-radius:10px; border:1px solid #2C2830; color:#C4536B; font-size:14px; font-weight:700;">Log out</a>
+</div>
+{% endif %}
+
+<form id="report-user-form" method="post" style="display:none;">
+  <input type="hidden" name="reason" value="Reported from profile">
+</form>
+<script>
+function lufricaReportUser(userId, username) {
+  if (!confirm('Report @' + username + ' for review?')) return;
+  const form = document.getElementById('report-user-form');
+  form.action = '/report-user/' + userId;
+  form.submit();
+}
+</script>
+{% endblock %}

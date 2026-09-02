@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding: 20px 18px;">
+  <h2 style="font-family:'Fraunces',serif; color:#F4EFE6; font-size:19px; margin:0 0 20px;">Settings</h2>
+
+  {% if error %}<p style="color:#C4536B; font-size:13px; margin:0 0 14px;">{{ error }}</p>{% endif %}
+  {% if success %}<p style="color:#3E8E8A; font-size:13px; margin:0 0 14px;">{{ success }}</p>{% endif %}
+
+  <p style="color:#9A94A0; font-size:12px; text-transform:uppercase; margin-bottom:10px;">Change password</p>
+  <form method="post" action="/settings/password" style="margin-bottom:32px;">
+    <input type="password" name="current_password" placeholder="Current password" required style="width:100%; margin-bottom:10px; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:14px;">
+    <input type="password" name="new_password" placeholder="New password" required style="width:100%; margin-bottom:12px; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:14px;">
+    <button type="submit" style="width:100%; padding:11px 0; border-radius:10px; border:none; background:#D4A017; color:#100E13; font-size:14px; font-weight:700;">Update password</button>
+  </form>
+
+  <p style="color:#9A94A0; font-size:12px; text-transform:uppercase; margin-bottom:10px;">Danger zone</p>
+  <form method="post" action="/settings/delete-account" onsubmit="return confirm('This permanently deletes your account and everything you posted. Continue?');">
+    <input type="password" name="password" placeholder="Confirm your password" required style="width:100%; margin-bottom:12px; padding:11px 14px; border-radius:10px; border:1px solid #2C2830; background:#1B181F; color:#F4EFE6; font-size:14px;">
+    <button type="submit" style="width:100%; padding:11px 0; border-radius:10px; border:1px solid #C4536B; background:none; color:#C4536B; font-size:14px; font-weight:700;">Delete my account</button>
+  </form>
+</div>
+{% endblock %}

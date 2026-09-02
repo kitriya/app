@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+{% set display_post = post.shared_from if post.shared_from else post %}
+
+<div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px;">
+  <a href="/profile/{{ post.author.username }}" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+    {% if post.author.profile_pic %}
+    <img src="{{ post.author.profile_pic }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover;">
+    {% else %}
+    <div style="width:34px; height:34px; border-radius:50%; background:{{ post.author.theme_color }}; display:flex; align-items:center; justify-content:center; color:#100E13; font-size:13px; font-weight:700;">{{ post.author.username[:2]|upper }}</div>
+    {% endif %}
+    <span style="font-weight:700; font-size:14px; color:#F4EFE6;">{{ post.author.username }}</span>
+  </a>
+</div>
+
+{% if post.shared_from %}
+<p style="padding:0 16px; margin:-6px 0 8px; font-size:12px; color:#9A94A0;">🔁 Reposted from <a href="/profile/{{ post.shared_from.author.username }}" style="color:#3E8E8A;">@{{ post.shared_from.author.username }}</a></p>
+{% endif %}
+
+{% if display_post.media_paths %}
+<div class="post-media" ondblclick="lufricaDoubleTap(this)" style="position:relative; width:100%; aspect-ratio:4/5; background:#000;">
+  {% if display_post.media_type == 'reel' %}
+  <video src="{{ display_post.media_paths[0] }}" controls muted loop playsinline class="lf-filter-{{ display_post.filter_name }}" style="width:100%; height:100%; object-fit:cover;"></video>
+  {% elif display_post.media_paths|length > 1 %}
+  <div style="display:flex; overflow-x:auto; scroll-snap-type:x mandatory; width:100%; height:100%;">
+    {% for path in display_post.media_paths %}
+    <img src="{{ path }}" alt="{{ display_post.alt_text }}" class="lf-filter-{{ display_post.filter_name }}" style="flex:0 0 100%; scroll-snap-align:start; object-fit:cover;">
+    {% endfor %}
+  </div>
+  {% else %}
+  <img src="{{ display_post.media_paths[0] }}" alt="{{ display_post.alt_text }}" class="lf-filter-{{ display_post.filter_name }}" style="width:100%; height:100%; object-fit:cover;">
+  {% endif %}
+</div>
+{% endif %}
+
+<div style="display:flex; align-items:center; justify-content:space-between; padding:10px 16px 4px;">
+  <div style="display:flex; gap:16px;">
+    <form method="post" action="/like/{{ display_post.id }}" class="like-form">
+      <input type="hidden" name="next" value="/post/{{ post.id }}">
+      <button type="submit" data-liked="{{ 'true' if display_post.id in liked_ids else 'false' }}" style="background:none; border:none; display:flex; align-items:center;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="{{ '#C4536B' if display_post.id in liked_ids else 'none' }}" stroke="{{ '#C4536B' if display_post.id in liked_ids else '#F4EFE6' }}" stroke-width="1.6"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 5.5 4 2-2.5 3.5-4 5.5-4C21 5 23.5 8.5 21.5 12.5 19 16.65 12 21 12 21z"/></svg>
+      </button>
+    </form>
+    <form method="post" action="/repost/{{ display_post.id }}" onsubmit="return confirm('Repost this to your profile?');">
+      <button type="submit" style="background:none; border:none; display:flex; align-items:center; color:#F4EFE6;">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#F4EFE6" stroke-width="1.6"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+      </button>
+    </form>
+  </div>
+  <form method="post" action="/save/{{ display_post.id }}">
+    <input type="hidden" name="next" value="/post/{{ post.id }}">
+    <button type="submit" style="background:none; border:none;">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="{{ '#F4EFE6' if display_post.id in saved_ids else 'none' }}" stroke="#F4EFE6" stroke-width="1.6"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+    </button>
+  </form>
+</div>
+
+<p style="padding:2px 16px 0; margin:4px 0 0; font-size:13.5px; font-weight:700; color:#F4EFE6;"><span class="like-count" data-count="{{ display_post.likes_count }}">{{ display_post.likes_count }}</span> likes</p>
+{% if post.caption %}<p style="padding:2px 16px 0; margin:4px 0 0; font-size:14px; color:#F4EFE6;"><span style="font-weight:700;">{{ post.author.username }}</span> {{ post.caption|linkify }}</p>{% endif %}
+{% if post.shared_from and post.shared_from.caption %}<p style="padding:2px 16px 0; margin:4px 0 0; font-size:14px; color:#F4EFE6;"><span style="font-weight:700;">{{ post.shared_from.author.username }}</span> {{ post.shared_from.caption|linkify }}</p>{% endif %}
+
+{% if post.user_id == current_user.id %}
+<div style="display:flex; gap:14px; padding:10px 16px 0;">
+  <form method="post" action="/pin/{{ post.id }}"><input type="hidden" name="next" value="/post/{{ post.id }}"><button type="submit" style="background:none; border:none; color:{{ '#D4A017' if post.pinned else '#9A94A0' }}; font-size:12.5px;">{{ 'Unpin' if post.pinned else 'Pin to profile' }}</button></form>
+  <form method="post" action="/archive/{{ post.id }}"><input type="hidden" name="next" value="/profile"><button type="submit" style="background:none; border:none; color:#9A94A0; font-size:12.5px;">{{ 'Unarchive' if post.archived else 'Archive' }}</button></form>
+  <form method="post" action="/delete-post/{{ post.id }}" onsubmit="return confirm('Delete this post?');"><input type="hidden" name="next" value="/profile"><button type="submit" style="background:none; border:none; color:#C4536B; font-size:12.5px;">Delete</button></form>
+</div>
+{% endif %}
+
+<div style="padding:12px 16px 0;">
+  {% for c in post.comments %}
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin:8px 0;">
+    <p style="font-size:13.5px; color:#F4EFE6; margin:0; flex:1;"><span style="font-weight:700;">{{ c.author.username }}</span> {{ c.body }}</p>
+    <form method="post" action="/comment-like/{{ c.id }}" style="margin-left:8px;">
+      <input type="hidden" name="next" value="/post/{{ post.id }}">
+      <button type="submit" style="background:none; border:none; display:flex; align-items:center; gap:3px;">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="{{ '#C4536B' if c.id in comment_liked_ids else 'none' }}" stroke="{{ '#C4536B' if c.id in comment_liked_ids else '#9A94A0' }}" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 5.5 4 2-2.5 3.5-4 5.5-4C21 5 23.5 8.5 21.5 12.5 19 16.65 12 21 12 21z"/></svg>
+        <span style="color:#9A94A0; font-size:11px;">{{ c.likes_count }}</span>
+      </button>
+    </form>
+  </div>
+  {% else %}
+  <p style="color:#9A94A0; text-align:center; padding:20px 0;">No comments yet.</p>
+  {% endfor %}
+</div>
+
+<form method="post" action="/comment/{{ post.id }}" style="display:flex; gap:8px; padding:12px 16px 20px;">
+  <input type="hidden" name="next" value="/post/{{ post.id }}">
+  <input type="text" name="body" placeholder="Add a comment" required style="flex:1; background:#1B181F; border:1px solid #2C2830; border-radius:8px; padding:8px 10px; color:#F4EFE6; font-size:13px;">
+  <button type="submit" style="background:none; border:none; color:#3E8E8A; font-weight:700; font-size:13px;">Post</button>
+</form>
+{% endblock %}
